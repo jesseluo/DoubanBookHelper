@@ -1,35 +1,35 @@
 $(document).ready(function() {
-	var bookname = document.title.slice(0, document.title.length - 5);
-	var buyinfo_ebook;
-	var buyinfo_printed = $("#buyinfo #buyinfo-printed")[0];
-	var link_std_node = buyinfo_printed.getElementsByTagName("li")[0].cloneNode(true);
+	var _bookname = document.title.slice(0, document.title.length - 5);
+	var _buyinfoOfEbook;
+	var _buyinfoOfPrinted = $("#buyinfo #buyinfo-printed")[0];
+	var _stdInfoNode = _buyinfoOfPrinted.getElementsByTagName("li")[0].cloneNode(true);
 	
 	if ($("#buyinfo #buyinfo-ebook").length === 0) 
 	{
-		buyinfo_ebook = buyinfo_printed.cloneNode(true);
-		buyinfo_ebook.id = "buyinfo-ebook";
+		_buyinfoOfEbook = _buyinfoOfPrinted.cloneNode(true);
+		_buyinfoOfEbook.id = "buyinfo-ebook";
 
-		buyinfo_printed.getElementsByTagName("h2")[0].firstChild.nodeValue="纸质版";
-		buyinfo_ebook.getElementsByTagName("h2")[0].firstChild.nodeValue="电子版";
+		_buyinfoOfPrinted.getElementsByTagName("h2")[0].firstChild.nodeValue="纸质版";
+		_buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue="电子版";
 
-		// alert(buyinfo_ebook.getElementsByTagName("h2")[0].firstChild.nodeValue);
+		// alert(_buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue);
 		
-		var web_nodes = buyinfo_ebook.getElementsByTagName("li");
-		var web_nodes_len = web_nodes.length;
-		for (var i = 0; i < web_nodes_len; i++) {
-			web_nodes[0].parentNode.removeChild(web_nodes[0]);	
+		var _buyinfoItemNodes = _buyinfoOfEbook.getElementsByTagName("li");
+		var _numOfBuyinfoItemNodes = _buyinfoItemNodes.length;
+		for (var i = 0; i < _numOfBuyinfoItemNodes; i++) {
+			_buyinfoItemNodes[0].parentNode.removeChild(_buyinfoItemNodes[0]);	
 		};	
 		
-		buyinfo_printed.parentNode.insertBefore(buyinfo_ebook, buyinfo_printed);
-		// $("#buyinfo-printed").before(buyinfo_ebook);		
+		_buyinfoOfPrinted.parentNode.insertBefore(_buyinfoOfEbook, _buyinfoOfPrinted);
+		// $("#buyinfo-printed").before(_buyinfoOfEbook);		
 	}
 	else
 	{
 		$("#buyinfo #buyinfo-ebook .ebook-tag").hide();
-		buyinfo_ebook = $("#buyinfo #buyinfo-ebook")[0];
+		_buyinfoOfEbook = $("#buyinfo #buyinfo-ebook")[0];
 	};
 
-	buyinfo_ebook.getElementsByTagName("ul")[0].appendChild(link_std_node.cloneNode(true));
+	_buyinfoOfEbook.getElementsByTagName("ul")[0].appendChild(_stdInfoNode.cloneNode(true));
 
 	// var link_duokan = "http://book.duokan.com/search/"+ bookname + "/1";
 	// var link_tangcha = "http://tangcha.tc/books/search/" + bookname;
@@ -43,6 +43,3 @@ $(document).ready(function() {
 	// $("#buyinfo ul li:first").before(li_class_str_tangcha);
 });
 
-function get_buyinfo_ebooks() {
-	return;
-}
