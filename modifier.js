@@ -5,20 +5,16 @@ function getBody(content) {
    return content.slice(x + 1, y);
 }
 
+function processTangcha (data, status) {
+	console.log(data);
+}
+
 function processDuokan (data, status) {
 	var _start, _end;
 	var _link, _price;
-	console.log(data);
 
 	if (status === "success") {
 		if (data.indexOf("很抱歉，没有找到") == -1) {
-			// var webContent = document.createElement("div");
-			// webContent.innerHTML = getBody(data);
-			// console.log(typeof webContent);
-			// console.log(webContent);
-			// var bookInfo = webContent.childNodes[0].getElementById("searchlist").getElementsByTagName("div")[1];
-			// console.log(bookInfo);
-
 			_start = data.indexOf("<div class=\"info\">");
 			_start = data.indexOf("href", _start) + 7;
 			_end = data.indexOf("hidefocus", _start) - 2;
