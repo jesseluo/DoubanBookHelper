@@ -1,10 +1,56 @@
+function processDuokan (data, status) {
+	// if (_httpReq.readyState==4)
+	// {
+	// 	if (_httpReq.status==200)
+	// 	{
+	// 		console.log(_httpReq.responseText);
+	// 		this.webContent = _httpReq.responseText;
+	// 	}
+	// }
+	// else
+	// {
+	// 	console.log("Problem retrieving data");
+	// }
+	// return([data, status]);
+	if (status === "success") {
+		console.log(typeof data);
+	}
+	else {
+		console.log(status);
+	}
+}
+
+function OnlineBookStore(storeName, searchUrlTmpl, funcToProcess) {
+	this.storeName = storeName;
+	this.searchUrlTmpl = searchUrlTmpl;
+	this.funcToProcess = funcToProcess;
+}
+
 $(document).ready(function() {
 	var _bookname = document.title.slice(0, document.title.length - 5);
+
+	var _bookstores = [];
+	_bookstores[0] = new OnlineBookStore("Duokan", "http://book.duokan.com/search/{{=bookname }}/1", processDuokan);
+
+	for (var i = 0; i < _bookstores.length; i++) {
+		console.log(i);
+		_searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);
+		// _httpReq.onreadystatechange = _bookstores[i].funcToProcess;
+		// _httpReq.open("GET", _searchURL, true);
+		// _httpReq.send(null);
+		$.get(
+			_searchURL,
+			_bookstores[i].funcToProcess
+		);
+
+		// document.write(_bookstores[i].webContent + "<br>");
+	}
+
 	var _buyinfoOfEbook;
 	var _buyinfoOfPrinted = $("#buyinfo #buyinfo-printed")[0];
 	var _stdInfoNode = _buyinfoOfPrinted.getElementsByTagName("li")[0].cloneNode(true);
-	
-	if ($("#buyinfo #buyinfo-ebook").length === 0) 
+
+	if ($("#buyinfo #buyinfo-ebook").length === 0)
 	{
 		_buyinfoOfEbook = _buyinfoOfPrinted.cloneNode(true);
 		_buyinfoOfEbook.id = "buyinfo-ebook";
@@ -13,13 +59,13 @@ $(document).ready(function() {
 		_buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue="电子版";
 
 		// alert(_buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue);
-		
+
 		var _buyinfoItemNodes = _buyinfoOfEbook.getElementsByTagName("li");
 		var _numOfBuyinfoItemNodes = _buyinfoItemNodes.length;
-		for (var i = 0; i < _numOfBuyinfoItemNodes; i++) {
-			_buyinfoItemNodes[0].parentNode.removeChild(_buyinfoItemNodes[0]);	
-		};	
-		
+		for (i = 0; i < _numOfBuyinfoItemNodes; i++) {
+			_buyinfoItemNodes[0].parentNode.removeChild(_buyinfoItemNodes[0]);
+		}
+
 		_buyinfoOfPrinted.parentNode.insertBefore(_buyinfoOfEbook, _buyinfoOfPrinted);
 		// $("#buyinfo-printed").before(_buyinfoOfEbook);		
 	}
@@ -27,19 +73,8 @@ $(document).ready(function() {
 	{
 		$("#buyinfo #buyinfo-ebook .ebook-tag").hide();
 		_buyinfoOfEbook = $("#buyinfo #buyinfo-ebook")[0];
-	};
+	}
 
 	_buyinfoOfEbook.getElementsByTagName("ul")[0].appendChild(_stdInfoNode.cloneNode(true));
-
-	// var link_duokan = "http://book.duokan.com/search/"+ bookname + "/1";
-	// var link_tangcha = "http://tangcha.tc/books/search/" + bookname;
-
-	// var li_class_str_duokan =  "<li><a target=\"_blank\" href=\""+ link_duokan 
-	// 	+ "\" class=\"\">多看</a></li>";
- //    var li_class_str_tangcha =  "<li><a target=\"_blank\" href=\""+ link_tangcha
- //    	+ "\" class=\"\">唐茶</a></li>";      
-
-	// $("#buyinfo ul li:first").before(li_class_str_duokan);
-	// $("#buyinfo ul li:first").before(li_class_str_tangcha);
 });
 

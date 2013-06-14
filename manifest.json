@@ -14,5 +14,8 @@
       "matches": ["http://book.douban.com/subject/*"],
       "js": ["jquery-1.9.1.min.js", "modifier.js"]
     }
+  ],
+  "permissions": [
+    "http://*.duokan.com/"
   ]
 }
