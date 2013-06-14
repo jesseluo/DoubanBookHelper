@@ -1,17 +1,4 @@
 function processDuokan (data, status) {
-	// if (_httpReq.readyState==4)
-	// {
-	// 	if (_httpReq.status==200)
-	// 	{
-	// 		console.log(_httpReq.responseText);
-	// 		this.webContent = _httpReq.responseText;
-	// 	}
-	// }
-	// else
-	// {
-	// 	console.log("Problem retrieving data");
-	// }
-	// return([data, status]);
 	if (status === "success") {
 		console.log(typeof data);
 	}
@@ -35,9 +22,6 @@ $(document).ready(function() {
 	for (var i = 0; i < _bookstores.length; i++) {
 		console.log(i);
 		_searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);
-		// _httpReq.onreadystatechange = _bookstores[i].funcToProcess;
-		// _httpReq.open("GET", _searchURL, true);
-		// _httpReq.send(null);
 		$.get(
 			_searchURL,
 			_bookstores[i].funcToProcess
