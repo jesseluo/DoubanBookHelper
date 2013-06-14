@@ -1,6 +1,37 @@
+function getBody(content) {
+   var x = content.indexOf("<body");
+   x = content.indexOf(">", x);
+   var y = content.lastIndexOf("</body>");
+   return content.slice(x + 1, y);
+}
+
 function processDuokan (data, status) {
+	var _start, _end;
+	var _link, _price;
+	console.log(data);
+
 	if (status === "success") {
-		console.log(typeof data);
+		if (data.indexOf("很抱歉，没有找到") == -1) {
+			// var webContent = document.createElement("div");
+			// webContent.innerHTML = getBody(data);
+			// console.log(typeof webContent);
+			// console.log(webContent);
+			// var bookInfo = webContent.childNodes[0].getElementById("searchlist").getElementsByTagName("div")[1];
+			// console.log(bookInfo);
+
+			_start = data.indexOf("<div class=\"info\">");
+			_start = data.indexOf("href", _start) + 7;
+			_end = data.indexOf("hidefocus", _start) - 2;
+			_link = data.slice(_start, _end);
+			_link = "http://book.duokan.com/" + _link;
+
+			_start = data.indexOf("price\">") + 15;
+			_end = data.indexOf("<", _start);
+			_price = data.slice(_start, _end);
+		}
+
+		console.log(_link);
+		console.log(_price);
 	}
 	else {
 		console.log(status);
@@ -11,6 +42,8 @@ function OnlineBookStore(storeName, searchUrlTmpl, funcToProcess) {
 	this.storeName = storeName;
 	this.searchUrlTmpl = searchUrlTmpl;
 	this.funcToProcess = funcToProcess;
+	this.linkToBook = null;
+	this.priceOfBook = null;
 }
 
 $(document).ready(function() {
