@@ -16,6 +16,7 @@
     }
   ],
   "permissions": [
-    "http://*.duokan.com/"
+    "http://*.duokan.com/",
+    "http://tangcha.tc/"
   ]
 }
