@@ -1,10 +1,3 @@
-function getBody(content) {
-   var x = content.indexOf("<body");
-   x = content.indexOf(">", x);
-   var y = content.lastIndexOf("</body>");
-   return content.slice(x + 1, y);
-}
-
 function processTangcha (data, status) {
 	console.log(data);
 }
@@ -23,11 +16,18 @@ function processDuokan (data, status) {
 
 			_start = data.indexOf("price\">") + 15;
 			_end = data.indexOf("<", _start);
-			_price = data.slice(_start, _end);
+			_price = "RMB " + data.slice(_start, _end);
 		}
 
 		console.log(_link);
 		console.log(_price);
+
+		var _itemNode = stdInfoNode.cloneNode(true);
+		_itemNode.getElementsByTagName("a")[0].href=_link;
+		_itemNode.getElementsByTagName("span")[0].firstChild.nodeValue="多看";
+		_itemNode.getElementsByTagName("span")[1].getElementsByTagName("span")[0].firstChild.nodeValue=_price;
+		buyinfoOfEbook.getElementsByTagName("ul")[0].appendChild(_itemNode);
+		console.log(_itemNode);
 	}
 	else {
 		console.log(status);
@@ -38,13 +38,10 @@ function OnlineBookStore(storeName, searchUrlTmpl, funcToProcess) {
 	this.storeName = storeName;
 	this.searchUrlTmpl = searchUrlTmpl;
 	this.funcToProcess = funcToProcess;
-	this.linkToBook = null;
-	this.priceOfBook = null;
 }
 
 $(document).ready(function() {
 	var _bookname = document.title.slice(0, document.title.length - 5);
-
 	var _bookstores = [];
 	_bookstores[0] = new OnlineBookStore("Duokan", "http://book.duokan.com/search/{{=bookname }}/1", processDuokan);
 
@@ -55,39 +52,31 @@ $(document).ready(function() {
 			_searchURL,
 			_bookstores[i].funcToProcess
 		);
-
-		// document.write(_bookstores[i].webContent + "<br>");
 	}
 
-	var _buyinfoOfEbook;
-	var _buyinfoOfPrinted = $("#buyinfo #buyinfo-printed")[0];
-	var _stdInfoNode = _buyinfoOfPrinted.getElementsByTagName("li")[0].cloneNode(true);
+	buyinfoOfPrinted = $("#buyinfo #buyinfo-printed")[0];
+	stdInfoNode = buyinfoOfPrinted.getElementsByTagName("li")[0].cloneNode(true);
 
 	if ($("#buyinfo #buyinfo-ebook").length === 0)
 	{
-		_buyinfoOfEbook = _buyinfoOfPrinted.cloneNode(true);
-		_buyinfoOfEbook.id = "buyinfo-ebook";
+		buyinfoOfEbook = buyinfoOfPrinted.cloneNode(true);
+		buyinfoOfEbook.id = "buyinfo-ebook";
+		buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue="电子版";
+		buyinfoOfPrinted.getElementsByTagName("h2")[0].firstChild.nodeValue="纸质版";
+		// alert(buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue);
 
-		_buyinfoOfPrinted.getElementsByTagName("h2")[0].firstChild.nodeValue="纸质版";
-		_buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue="电子版";
-
-		// alert(_buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue);
-
-		var _buyinfoItemNodes = _buyinfoOfEbook.getElementsByTagName("li");
+		var _buyinfoItemNodes = buyinfoOfEbook.getElementsByTagName("li");
 		var _numOfBuyinfoItemNodes = _buyinfoItemNodes.length;
 		for (i = 0; i < _numOfBuyinfoItemNodes; i++) {
 			_buyinfoItemNodes[0].parentNode.removeChild(_buyinfoItemNodes[0]);
 		}
-
-		_buyinfoOfPrinted.parentNode.insertBefore(_buyinfoOfEbook, _buyinfoOfPrinted);
-		// $("#buyinfo-printed").before(_buyinfoOfEbook);		
+		// $("#buyinfo-printed").before(buyinfoOfEbook);
+		buyinfoOfPrinted.parentNode.insertBefore(buyinfoOfEbook, buyinfoOfPrinted);
 	}
 	else
 	{
 		$("#buyinfo #buyinfo-ebook .ebook-tag").hide();
-		_buyinfoOfEbook = $("#buyinfo #buyinfo-ebook")[0];
+		buyinfoOfEbook = $("#buyinfo #buyinfo-ebook")[0];
+		buyinfoOfEbook.getElementsByTagName("li")[0].getElementsByTagName("span")[0].firstChild.nodeValue="豆瓣";
 	}
-
-	_buyinfoOfEbook.getElementsByTagName("ul")[0].appendChild(_stdInfoNode.cloneNode(true));
 });
-

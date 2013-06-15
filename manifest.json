@@ -3,7 +3,7 @@
 
   "name": "Douban Book Helper",
   "description": "Add some easy accesses to Douban Book",
-  "version": "0.2",
+  "version": "0.3",
 
   "browser_action": {
     "default_icon": "icon.png",
