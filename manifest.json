@@ -17,6 +17,7 @@
   ],
   "permissions": [
     "http://*.duokan.com/",
-    "http://tangcha.tc/"
+    "http://tangcha.tc/",
+    "http://www.yuncheng.com/"
   ]
 }

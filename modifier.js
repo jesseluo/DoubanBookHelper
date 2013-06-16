@@ -4,6 +4,7 @@ function appendItemNode (id, name, link, price) {
 	console.log(price);
 
 	var _itemNode = stdInfoNode.cloneNode(true);
+	console.log(_itemNode);
 	_itemNode.id = id;
 	_itemNode.getElementsByTagName("a")[0].href = link;
 	_itemNode.getElementsByTagName("span")[0].firstChild.nodeValue = name;
@@ -59,6 +60,39 @@ function processTangcha (data, status) {
 	}
 }
 
+function processYuncheng (data, status) {
+	var _start, _end;
+	var _link, _price;
+
+	if (status === "success") {
+		if (data.indexOf("很抱歉，没有找到") == -1) {
+			_start = data.indexOf("booklist");
+			_start = data.indexOf("href", _start) + 7;
+			_end = data.indexOf("rank", _start) - 2;
+			_link = data.slice(_start, _end);
+			_link = "http://www.yuncheng.com/" + _link;
+
+			_start = data.indexOf("云 城 价") + 6;
+			_end = _start + 2;
+			_price = data.slice(_start, _end);
+
+			if (_price !== "免费") {
+				_start = data.indexOf(">", _start) + 6;
+				_end = data.indexOf("<", _start) - 1;
+				_price = "RMB " + data.slice(_start, _end);
+			}
+
+			appendItemNode("buyinfo-yuncheng", "云中书城", _link, _price);
+		}
+		else{
+			console.log("No found on Yuncheng");
+		}
+	}
+	else {
+		console.log("Get Yuncheng failed, status = " + status);
+	}
+}
+
 function processDuokan (data, status) {
 	var _start, _end;
 	var _link, _price;
@@ -93,20 +127,6 @@ function OnlineBookStore(storeName, searchUrlTmpl, funcToProcess) {
 }
 
 $(document).ready(function() {
-	var _bookname = document.title.slice(0, document.title.length - 5);
-	var _bookstores = [];
-	_bookstores[0] = new OnlineBookStore("Duokan", "http://book.duokan.com/search/{{=bookname }}/1", processDuokan);
-	_bookstores[1] = new OnlineBookStore("Tangcha", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
-	// _bookstores[2] = new OnlineBookStore("Yuncheng", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
-
-	for (var i = 0; i < _bookstores.length; i++) {
-		_searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);
-		$.get(
-			_searchURL,
-			_bookstores[i].funcToProcess
-		);
-	}
-
 	buyinfoOfPrinted = $("#buyinfo #buyinfo-printed")[0];
 	stdInfoNode = buyinfoOfPrinted.getElementsByTagName("li")[0].cloneNode(true);
 
@@ -128,6 +148,27 @@ $(document).ready(function() {
 	{
 		$("#buyinfo #buyinfo-ebook .ebook-tag").hide();
 		buyinfoOfEbook = $("#buyinfo #buyinfo-ebook")[0];
+		buyinfoOfEbook.getElementsByTagName("li")[0].id = "buyinfo-douban";
 		buyinfoOfEbook.getElementsByTagName("li")[0].getElementsByTagName("span")[0].firstChild.nodeValue="豆瓣";
+	}
+
+	var _add2cartContainer = buyinfoOfEbook.getElementsByClassName("add2cartContainer ft")[0];
+	console.log(_add2cartContainer);
+	if (_add2cartContainer !== undefined) {
+		_add2cartContainer.parentNode.removeChild(_add2cartContainer);
+	}
+
+	var _bookname = document.title.slice(0, document.title.length - 5);
+	var _bookstores = [];
+	_bookstores[0] = new OnlineBookStore("Duokan", "http://book.duokan.com/search/{{=bookname }}/1", processDuokan);
+	_bookstores[1] = new OnlineBookStore("Tangcha", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
+	_bookstores[2] = new OnlineBookStore("Yuncheng", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
+
+	for (var i = 0; i < _bookstores.length; i++) {
+		_searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);
+		$.get(
+			_searchURL,
+			_bookstores[i].funcToProcess
+		);
 	}
 });
