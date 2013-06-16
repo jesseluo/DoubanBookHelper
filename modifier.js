@@ -1,3 +1,17 @@
+function appendItemNode (id, name, link, price) {
+	console.log(name);
+	console.log(link);
+	console.log(price);
+
+	var _itemNode = stdInfoNode.cloneNode(true);
+	_itemNode.id = id;
+	_itemNode.getElementsByTagName("a")[0].href = link;
+	_itemNode.getElementsByTagName("span")[0].firstChild.nodeValue = name;
+	_itemNode.getElementsByTagName("span")[1].getElementsByTagName("span")[0]
+		.firstChild.nodeValue = price;
+	buyinfoOfEbook.getElementsByTagName("ul")[0].appendChild(_itemNode);
+}
+
 function processTangcha (data, status) {
 	var _start, _end;
 	var _link, _price;
@@ -10,26 +24,38 @@ function processTangcha (data, status) {
 			_link = data.slice(_start, _end);
 			_link = "http://tangcha.tc/" + _link;
 
-			// _start = data.indexOf("price\">") + 15;
-			// _end = data.indexOf("<", _start);
-			// _price = "RMB " + data.slice(_start, _end);
-			_price = "RMB ??";
+			appendItemNode("buyinfo-tangcha", "唐茶字节社", _link, "fetching");
 
-			console.log(_link);
-			console.log(_price);
+			$.get(
+				_link,
+				function(data, status) {
+					var _start, _end, _price;
 
-			var _itemNode = stdInfoNode.cloneNode(true);
-			_itemNode.getElementsByTagName("a")[0].href=_link;
-			_itemNode.getElementsByTagName("span")[0].firstChild.nodeValue="字节社";
-			_itemNode.getElementsByTagName("span")[1].getElementsByTagName("span")[0].firstChild.nodeValue=_price;
-			buyinfoOfEbook.getElementsByTagName("ul")[0].appendChild(_itemNode);
+					if (status === "success") {
+						_start = data.indexOf("book-purchase");
+						_start = data.indexOf(">", _start) + 3;
+						_end = data.indexOf("<", _start);
+						_price = "RMB " + data.slice(_start, _end);
+
+						document.getElementById("buyinfo-tangcha")
+							.getElementsByTagName("span")[1]
+							.getElementsByTagName("span")[0]
+							.firstChild.nodeValue = _price;
+					}
+					else {
+						console.log("Get Tangcha failed, status = " + status);
+						var _buyinfoTangcha = document.getElementById("buyinfo-tangcha");
+						_buyinfoTangcha.parentNode.removeChild(_buyinfoTangcha);
+					}
+				}
+			);
 		}
 		else{
 			console.log("No found on Tangcha");
 		}
 	}
 	else {
-		console.log(status);
+		console.log("Get Tangcha failed, status = " + status);
 	}
 }
 
@@ -49,23 +75,14 @@ function processDuokan (data, status) {
 			_end = data.indexOf("<", _start);
 			_price = "RMB " + data.slice(_start, _end);
 
-			console.log(_link);
-			console.log(_price);
-
-			var _itemNode = stdInfoNode.cloneNode(true);
-			_itemNode.getElementsByTagName("a")[0].href=_link;
-			_itemNode.getElementsByTagName("span")[0].firstChild.nodeValue="多看";
-			_itemNode.getElementsByTagName("span")[1].getElementsByTagName("span")[0].firstChild.nodeValue=_price;
-			buyinfoOfEbook.getElementsByTagName("ul")[0].appendChild(_itemNode);
-			console.log(_itemNode);
+			appendItemNode("buyinfo-duokan", "多看书城", _link, _price);
 		}
 		else{
 			console.log("No found on Duokan");
 		}
-
 	}
 	else {
-		console.log(status);
+		console.log("Get Duokan failed, status = " + status);
 	}
 }
 
@@ -80,9 +97,9 @@ $(document).ready(function() {
 	var _bookstores = [];
 	_bookstores[0] = new OnlineBookStore("Duokan", "http://book.duokan.com/search/{{=bookname }}/1", processDuokan);
 	_bookstores[1] = new OnlineBookStore("Tangcha", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
+	// _bookstores[2] = new OnlineBookStore("Yuncheng", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
 
 	for (var i = 0; i < _bookstores.length; i++) {
-		console.log(i);
 		_searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);
 		$.get(
 			_searchURL,
@@ -99,7 +116,6 @@ $(document).ready(function() {
 		buyinfoOfEbook.id = "buyinfo-ebook";
 		buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue="电子版";
 		buyinfoOfPrinted.getElementsByTagName("h2")[0].firstChild.nodeValue="纸质版";
-		// alert(buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue);
 
 		var _buyinfoItemNodes = buyinfoOfEbook.getElementsByTagName("li");
 		var _numOfBuyinfoItemNodes = _buyinfoItemNodes.length;
