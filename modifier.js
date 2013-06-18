@@ -1,7 +1,5 @@
 function makeItemNodeTemplate (argument) {
 	ITEMNODE_TEMPLATE = document.createElement("li");
-	ITEMNODE_TEMPLATE.className = "";
-
 	var _linkNode = document.createElement("a");
 	var _spanNodeName = document.createElement("span");
 	var _spanNodePrice = document.createElement("span");
@@ -14,6 +12,7 @@ function makeItemNodeTemplate (argument) {
 	_spanNodeName.className = "";
 	_linkNode.target = "_blank";
 	_linkNode.className = "";
+	ITEMNODE_TEMPLATE.className = "";
 
 	_spanNodePrice.appendChild(document.createTextNode("( "));
 	_spanNodePrice.appendChild(_spanNodePriceStr);
@@ -21,22 +20,17 @@ function makeItemNodeTemplate (argument) {
 	_linkNode.appendChild(_spanNodeName);
 	_linkNode.appendChild(_spanNodePrice);
 	ITEMNODE_TEMPLATE.appendChild(_linkNode);
-
-	console.log(ITEMNODE_TEMPLATE.getElementsByTagName("span"));
 }
 
 function appendItemNode (id, name, link, price) {
-	console.log(name);
-	console.log(link);
-	console.log(price);
-
 	var _itemNode = ITEMNODE_TEMPLATE.cloneNode(true);
-	console.log(_itemNode);
 	_itemNode.id = id;
 	_itemNode.getElementsByTagName("a")[0].href = link;
 	_itemNode.getElementsByTagName("span")[0].firstChild.nodeValue = name;
 	_itemNode.getElementsByTagName("span")[1].getElementsByTagName("span")[0]
 		.firstChild.nodeValue = price;
+	console.log(_itemNode);
+
 	buyinfoOfEbook.getElementsByTagName("ul")[0].appendChild(_itemNode);
 }
 
@@ -163,7 +157,6 @@ $(document).ready(function() {
 	_bookstores[1] = new OnlineBookStore("Tangcha", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
 	_bookstores[2] = new OnlineBookStore("Yuncheng", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
 
-
 	if ($("#buyinfo #buyinfo-ebook").length === 0)
 	{
 		buyinfoOfEbook = buyinfoOfPrinted.cloneNode(true);
@@ -187,13 +180,14 @@ $(document).ready(function() {
 	}
 
 	var _add2cartContainer = buyinfoOfEbook.getElementsByClassName("add2cartContainer ft")[0];
-	console.log(_add2cartContainer);
 	if (_add2cartContainer !== undefined) {
 		_add2cartContainer.parentNode.removeChild(_add2cartContainer);
 	}
 
 	for (var i = 0; i < _bookstores.length; i++) {
 		_searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);
+		console.log("Search link: " + _searchURL);
+
 		$.get(
 			_searchURL,
 			_bookstores[i].funcToProcess
