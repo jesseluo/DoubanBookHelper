@@ -1,9 +1,36 @@
+function makeItemNodeTemplate (argument) {
+	ITEMNODE_TEMPLATE = document.createElement("li");
+	ITEMNODE_TEMPLATE.className = "";
+
+	var _linkNode = document.createElement("a");
+	var _spanNodeName = document.createElement("span");
+	var _spanNodePrice = document.createElement("span");
+	var _spanNodePriceStr = document.createElement("span");
+
+	_spanNodePriceStr.className = "";
+	_spanNodePriceStr.appendChild(document.createTextNode("fetching"));
+	_spanNodePrice.className = "buylink-price";
+	_spanNodeName.appendChild(document.createTextNode("fetching"));
+	_spanNodeName.className = "";
+	_linkNode.target = "_blank";
+	_linkNode.className = "";
+
+	_spanNodePrice.appendChild(document.createTextNode("( "));
+	_spanNodePrice.appendChild(_spanNodePriceStr);
+	_spanNodePrice.appendChild(document.createTextNode(") "));
+	_linkNode.appendChild(_spanNodeName);
+	_linkNode.appendChild(_spanNodePrice);
+	ITEMNODE_TEMPLATE.appendChild(_linkNode);
+
+	console.log(ITEMNODE_TEMPLATE.getElementsByTagName("span"));
+}
+
 function appendItemNode (id, name, link, price) {
 	console.log(name);
 	console.log(link);
 	console.log(price);
 
-	var _itemNode = stdInfoNode.cloneNode(true);
+	var _itemNode = ITEMNODE_TEMPLATE.cloneNode(true);
 	console.log(_itemNode);
 	_itemNode.id = id;
 	_itemNode.getElementsByTagName("a")[0].href = link;
@@ -127,8 +154,15 @@ function OnlineBookStore(storeName, searchUrlTmpl, funcToProcess) {
 }
 
 $(document).ready(function() {
+	makeItemNodeTemplate();
 	buyinfoOfPrinted = $("#buyinfo #buyinfo-printed")[0];
-	stdInfoNode = buyinfoOfPrinted.getElementsByTagName("li")[0].cloneNode(true);
+
+	var _bookname = document.title.slice(0, document.title.length - 5);
+	var _bookstores = [];
+	_bookstores[0] = new OnlineBookStore("Duokan", "http://book.duokan.com/search/{{=bookname }}/1", processDuokan);
+	_bookstores[1] = new OnlineBookStore("Tangcha", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
+	_bookstores[2] = new OnlineBookStore("Yuncheng", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
+
 
 	if ($("#buyinfo #buyinfo-ebook").length === 0)
 	{
@@ -157,12 +191,6 @@ $(document).ready(function() {
 	if (_add2cartContainer !== undefined) {
 		_add2cartContainer.parentNode.removeChild(_add2cartContainer);
 	}
-
-	var _bookname = document.title.slice(0, document.title.length - 5);
-	var _bookstores = [];
-	_bookstores[0] = new OnlineBookStore("Duokan", "http://book.duokan.com/search/{{=bookname }}/1", processDuokan);
-	_bookstores[1] = new OnlineBookStore("Tangcha", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
-	_bookstores[2] = new OnlineBookStore("Yuncheng", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
 
 	for (var i = 0; i < _bookstores.length; i++) {
 		_searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);

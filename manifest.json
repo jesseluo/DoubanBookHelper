@@ -2,12 +2,12 @@
   "manifest_version": 2,
 
   "name": "Douban Book Helper",
-  "description": "Add some easy accesses to Douban Book",
+  "description": "Add some easy accesses for ebooks to Douban Book",
   "version": "0.3",
 
   "browser_action": {
     "default_icon": "icon.png",
-    "default_title": "Douban Read Helper"
+    "default_title": "Douban Book Helper"
   },
   "content_scripts": [
     {
