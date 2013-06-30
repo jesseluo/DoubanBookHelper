@@ -184,7 +184,8 @@ function OnlineBookStore(name, chnName, searchUrlTmpl, functionOfDataProcess) {
 	this.functionForGet = functionOfDataProcess;
 }
 
-$(document).ready(function() {
+(function () {
+// $(document).ready(function() {
 	makeItemNodeTemplate();
 	makeBuyinfoNode();
 
@@ -204,4 +205,4 @@ $(document).ready(function() {
 			_bookstores[i].functionForGet
 		);
 	}
-});
+})();

@@ -1,20 +1,22 @@
 {
-  "manifest_version": 2,
-
   "name": "Douban Book Helper",
-  "description": "Add some easy accesses for ebooks to Douban Book",
-  "version": "0.3",
+  "version": "0.4.0",
+  "manifest_version": 2,
+  "description": "增强豆瓣读书对电子书的支持",
 
   "browser_action": {
     "default_icon": "icon.png",
     "default_title": "Douban Book Helper"
   },
+
   "content_scripts": [
     {
-      "matches": ["http://book.douban.com/subject/*"],
-      "js": ["jquery-1.9.1.min.js", "modifier.js"]
+      "matches": ["http://book.douban.com/subject/*/"],
+      "js": ["jquery-1.9.1.min.js", "modifier.js"],
+      "run_at": "document_end"
     }
   ],
+  
   "permissions": [
     "http://*.duokan.com/",
     "http://tangcha.tc/",
