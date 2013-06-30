@@ -22,6 +22,42 @@ function makeItemNodeTemplate (argument) {
 	ITEMNODE_TEMPLATE.appendChild(_linkNode);
 }
 
+function makeBuyinfoNode() {
+	buyinfoOfPrinted = $("#buyinfo #buyinfo-printed")[0];
+
+	if ($("#buyinfo #buyinfo-ebook").length === 0)
+	{
+		buyinfoOfEbook = buyinfoOfPrinted.cloneNode(true);
+		buyinfoOfEbook.id = "buyinfo-ebook";
+		buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue="电子版";
+		buyinfoOfPrinted.getElementsByTagName("h2")[0].firstChild.nodeValue="纸质版";
+
+		var _buyinfoItemNodes = buyinfoOfEbook.getElementsByTagName("li");
+		var _numOfBuyinfoItemNodes = _buyinfoItemNodes.length;
+		for (i = 0; i < _numOfBuyinfoItemNodes; i++) {
+			_buyinfoItemNodes[0].parentNode.removeChild(_buyinfoItemNodes[0]);
+		}
+		buyinfoOfPrinted.parentNode.insertBefore(buyinfoOfEbook, buyinfoOfPrinted);
+	}
+	else
+	{
+		$("#buyinfo #buyinfo-ebook .ebook-tag").hide();
+		buyinfoOfEbook = $("#buyinfo #buyinfo-ebook")[0];
+		buyinfoOfEbook.getElementsByTagName("li")[0].id = "buyinfo-douban";
+		buyinfoOfEbook.getElementsByTagName("li")[0].getElementsByTagName("span")[0].firstChild.nodeValue="豆瓣";
+	}
+
+	var _add2cartContainer = buyinfoOfEbook.getElementsByClassName("add2cartContainer ft")[0];
+	if (_add2cartContainer !== undefined) {
+		_add2cartContainer.parentNode.removeChild(_add2cartContainer);
+	}
+}
+
+function ResultOfProcess (link, price) {
+	this.link = _link;
+	this.price = _price;
+}
+
 function appendItemNode (id, name, link, price) {
 	var _itemNode = ITEMNODE_TEMPLATE.cloneNode(true);
 	_itemNode.id = id;
@@ -141,56 +177,31 @@ function processDuokan (data, status) {
 	}
 }
 
-function OnlineBookStore(storeName, searchUrlTmpl, funcToProcess) {
-	this.storeName = storeName;
+function OnlineBookStore(name, chnName, searchUrlTmpl, functionOfDataProcess) {
+	this.name = name;
+	this.chnName = chnName;
 	this.searchUrlTmpl = searchUrlTmpl;
-	this.funcToProcess = funcToProcess;
+	this.functionForGet = functionOfDataProcess;
 }
 
 $(document).ready(function() {
 	makeItemNodeTemplate();
-	buyinfoOfPrinted = $("#buyinfo #buyinfo-printed")[0];
+	makeBuyinfoNode();
 
 	var _bookname = document.title.slice(0, document.title.length - 5);
 	var _bookstores = [];
-	_bookstores[0] = new OnlineBookStore("Duokan", "http://book.duokan.com/search/{{=bookname }}/1", processDuokan);
-	_bookstores[1] = new OnlineBookStore("Tangcha", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
-	_bookstores[2] = new OnlineBookStore("Yuncheng", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
 
-	if ($("#buyinfo #buyinfo-ebook").length === 0)
-	{
-		buyinfoOfEbook = buyinfoOfPrinted.cloneNode(true);
-		buyinfoOfEbook.id = "buyinfo-ebook";
-		buyinfoOfEbook.getElementsByTagName("h2")[0].firstChild.nodeValue="电子版";
-		buyinfoOfPrinted.getElementsByTagName("h2")[0].firstChild.nodeValue="纸质版";
-
-		var _buyinfoItemNodes = buyinfoOfEbook.getElementsByTagName("li");
-		var _numOfBuyinfoItemNodes = _buyinfoItemNodes.length;
-		for (i = 0; i < _numOfBuyinfoItemNodes; i++) {
-			_buyinfoItemNodes[0].parentNode.removeChild(_buyinfoItemNodes[0]);
-		}
-		buyinfoOfPrinted.parentNode.insertBefore(buyinfoOfEbook, buyinfoOfPrinted);
-	}
-	else
-	{
-		$("#buyinfo #buyinfo-ebook .ebook-tag").hide();
-		buyinfoOfEbook = $("#buyinfo #buyinfo-ebook")[0];
-		buyinfoOfEbook.getElementsByTagName("li")[0].id = "buyinfo-douban";
-		buyinfoOfEbook.getElementsByTagName("li")[0].getElementsByTagName("span")[0].firstChild.nodeValue="豆瓣";
-	}
-
-	var _add2cartContainer = buyinfoOfEbook.getElementsByClassName("add2cartContainer ft")[0];
-	if (_add2cartContainer !== undefined) {
-		_add2cartContainer.parentNode.removeChild(_add2cartContainer);
-	}
+	_bookstores[0] = new OnlineBookStore("Duokan", "多看书城", "http://book.duokan.com/search/{{=bookname }}/1", processDuokan);
+	_bookstores[1] = new OnlineBookStore("Tangcha", "唐茶字节社", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
+	_bookstores[2] = new OnlineBookStore("Yuncheng", "云中书城", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
 
 	for (var i = 0; i < _bookstores.length; i++) {
-		_searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);
-		console.log("Search link: " + _searchURL);
+		_bookstores[i].searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);
+		console.log("Search link: " + _bookstores[i].searchURL);
 
 		$.get(
-			_searchURL,
-			_bookstores[i].funcToProcess
+			_bookstores[i].searchURL,
+			_bookstores[i].functionForGet
 		);
 	}
 });
