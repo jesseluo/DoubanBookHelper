@@ -1,3 +1,14 @@
+function getPriceString (price) {
+	return "RMB " + parseFloat(price).toFixed(2).toString();
+}
+
+Function.prototype.Apply = function (thisObj) {
+    var _method = this;
+    return function (data) {
+        return _method.apply(thisObj, [data]);
+    };
+};
+
 function makeItemNodeTemplate (argument) {
 	ITEMNODE_TEMPLATE = document.createElement("li");
 	var _linkNode = document.createElement("a");
@@ -151,24 +162,13 @@ function processYuncheng (data, status) {
 }
 
 function processDuokan (data, status) {
-	var _start, _end;
-	var _link, _price;
-
 	if (status === "success") {
-		if (data.indexOf("很抱歉，没有找到") == -1) {
-			_start = data.indexOf("<div class=\"info\">");
-			_start = data.indexOf("href", _start) + 7;
-			_end = data.indexOf("hidefocus", _start) - 2;
-			_link = data.slice(_start, _end);
-			_link = "http://book.duokan.com/" + _link;
-
-			_start = data.indexOf("price\">") + 15;
-			_end = data.indexOf("<", _start);
-			_price = "RMB " + data.slice(_start, _end);
-
-			appendItemNode("buyinfo-duokan", "多看书城", _link, _price);
+		if (data.count > 0) {
+			appendItemNode("buyinfo-duokan", "多看书城",
+				"http://book.duokan.com/" + data.items[0].afs + "/b/" + data.items[0].sid,
+				getPriceString(data.items[0].price));
 		}
-		else{
+		else {
 			console.log("No found on Duokan");
 		}
 	}
@@ -185,14 +185,13 @@ function OnlineBookStore(name, chnName, searchUrlTmpl, functionOfDataProcess) {
 }
 
 (function () {
-// $(document).ready(function() {
 	makeItemNodeTemplate();
 	makeBuyinfoNode();
 
 	var _bookname = document.title.slice(0, document.title.length - 5);
 	var _bookstores = [];
 
-	_bookstores[0] = new OnlineBookStore("Duokan", "多看书城", "http://book.duokan.com/search/{{=bookname }}/1", processDuokan);
+	_bookstores[0] = new OnlineBookStore("Duokan", "多看书城", "http://book.duokan.com/store/v0/web/search?s={{=bookname }}", processDuokan);
 	_bookstores[1] = new OnlineBookStore("Tangcha", "唐茶字节社", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
 	_bookstores[2] = new OnlineBookStore("Yuncheng", "云中书城", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
 
