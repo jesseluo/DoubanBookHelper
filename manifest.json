@@ -1,6 +1,6 @@
 {
   "name": "Douban Book Helper",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "manifest_version": 2,
   "description": "增强豆瓣读书对电子书的支持",
 
@@ -16,10 +16,11 @@
       "run_at": "document_end"
     }
   ],
-  
+
   "permissions": [
     "http://*.duokan.com/",
     "http://tangcha.tc/",
-    "http://www.yuncheng.com/"
+    "http://www.yuncheng.com/",
+    "http://www.amazon.cn/"
   ]
 }

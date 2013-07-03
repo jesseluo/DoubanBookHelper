@@ -81,6 +81,32 @@ function appendItemNode (id, name, link, price) {
 	buyinfoOfEbook.getElementsByTagName("ul")[0].appendChild(_itemNode);
 }
 
+function processAmazon (data, status) {
+	var _start, _end;
+	var _link, _price;
+
+	if (status === "success") {
+		if ((data.indexOf("分类下没有任何与") == -1) && (data.indexOf("没有找到任何与") == -1)) {
+			_start = data.indexOf("newaps");
+			_start = data.indexOf("href", _start) + 6;
+			_end = data.indexOf("ref=", _start);
+			_link = data.slice(_start, _end);
+
+			_start = data.indexOf("￥") + 1;
+			_end = data.indexOf("<", _start);
+			_price = "RMB " + data.slice(_start, _end);
+
+			appendItemNode("buyinfo-amazon", "亚马逊", _link, _price);
+		}
+		else{
+			console.log("No found on Amazon");
+		}
+	}
+	else {
+		console.log("Get Amazon failed, status = " + status);
+	}
+}
+
 function processTangcha (data, status) {
 	var _start, _end;
 	var _link, _price;
@@ -96,7 +122,7 @@ function processTangcha (data, status) {
 			appendItemNode("buyinfo-tangcha", "唐茶字节社", _link, "fetching");
 
 			$.get(
-				_link,
+				_link + "/partial.html",
 				function(data, status) {
 					var _start, _end, _price;
 
@@ -191,9 +217,10 @@ function OnlineBookStore(name, chnName, searchUrlTmpl, functionOfDataProcess) {
 	var _bookname = document.title.slice(0, document.title.length - 5);
 	var _bookstores = [];
 
-	_bookstores[0] = new OnlineBookStore("Duokan", "多看书城", "http://book.duokan.com/store/v0/web/search?s={{=bookname }}", processDuokan);
-	_bookstores[1] = new OnlineBookStore("Tangcha", "唐茶字节社", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
-	_bookstores[2] = new OnlineBookStore("Yuncheng", "云中书城", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
+	_bookstores[0] = new OnlineBookStore("Amazon", "亚马逊", "http://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&url=search-alias%3Ddigital-text&field-keywords={{=bookname }}", processAmazon);
+	_bookstores[1] = new OnlineBookStore("Duokan", "多看书城", "http://book.duokan.com/store/v0/web/search?s={{=bookname }}", processDuokan);
+	_bookstores[2] = new OnlineBookStore("Tangcha", "唐茶字节社", "http://tangcha.tc/books/search/{{=bookname }}", processTangcha);
+	_bookstores[3] = new OnlineBookStore("Yuncheng", "云中书城", "http://www.yuncheng.com/search?q={{=bookname }}", processYuncheng);
 
 	for (var i = 0; i < _bookstores.length; i++) {
 		_bookstores[i].searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);
