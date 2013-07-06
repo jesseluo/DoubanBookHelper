@@ -190,7 +190,7 @@ function processYuncheng (data, status) {
 function processDuokan (data, status) {
 	if (status === "success") {
 		if (data.count > 0) {
-			appendItemNode("buyinfo-duokan", "多看书城",
+			appendItemNode("buyinfo-duokan", this.chnName,
 				"http://book.duokan.com/" + data.items[0].afs + "/b/" + data.items[0].sid,
 				getPriceString(data.items[0].price));
 		}
@@ -226,9 +226,10 @@ function OnlineBookStore(name, chnName, searchUrlTmpl, functionOfDataProcess) {
 		_bookstores[i].searchURL = _bookstores[i].searchUrlTmpl.replace("{{=bookname }}", _bookname);
 		console.log("Search link: " + _bookstores[i].searchURL);
 
-		$.get(
-			_bookstores[i].searchURL,
-			_bookstores[i].functionForGet
-		);
+		$.ajax({
+			url: _bookstores[i].searchURL,
+			context: _bookstores[i],
+			success: _bookstores[i].functionForGet
+		});
 	}
 })();
