@@ -2,13 +2,6 @@ function getPriceString (price) {
 	return "RMB " + parseFloat(price).toFixed(2).toString();
 }
 
-Function.prototype.Apply = function (thisObj) {
-    var _method = this;
-    return function (data) {
-        return _method.apply(thisObj, [data]);
-    };
-};
-
 function makeItemNodeTemplate (argument) {
 	ITEMNODE_TEMPLATE = document.createElement("li");
 	var _linkNode = document.createElement("a");
@@ -27,7 +20,7 @@ function makeItemNodeTemplate (argument) {
 
 	_spanNodePrice.appendChild(document.createTextNode("( "));
 	_spanNodePrice.appendChild(_spanNodePriceStr);
-	_spanNodePrice.appendChild(document.createTextNode(") "));
+	_spanNodePrice.appendChild(document.createTextNode(" )"));
 	_linkNode.appendChild(_spanNodeName);
 	_linkNode.appendChild(_spanNodePrice);
 	ITEMNODE_TEMPLATE.appendChild(_linkNode);
@@ -64,11 +57,6 @@ function makeBuyinfoNode() {
 	}
 }
 
-function ResultOfProcess (link, price) {
-	this.link = _link;
-	this.price = _price;
-}
-
 function appendItemNode (id, name, link, price) {
 	var _itemNode = ITEMNODE_TEMPLATE.cloneNode(true);
 	_itemNode.id = id;
@@ -81,133 +69,136 @@ function appendItemNode (id, name, link, price) {
 	buyinfoOfEbook.getElementsByTagName("ul")[0].appendChild(_itemNode);
 }
 
-function processAmazon (data, status) {
+function processAmazon (data) {
 	var _start, _end;
 	var _link, _price;
 
-	if (status === "success") {
-		if ((data.indexOf("分类下没有任何与") == -1) && (data.indexOf("没有找到任何与") == -1)) {
-			_start = data.indexOf("newaps");
-			_start = data.indexOf("href", _start) + 6;
-			_end = data.indexOf("ref=", _start);
-			_link = data.slice(_start, _end);
+	if ((data.indexOf("分类下没有任何与") == -1) && (data.indexOf("没有找到任何与") == -1)) {
+		_start = data.indexOf("newaps");
+		_start = data.indexOf("href", _start) + 6;
+		_end = data.indexOf("ref=", _start);
+		_link = data.slice(_start, _end);
 
-			_start = data.indexOf("￥") + 1;
-			_end = data.indexOf("<", _start);
-			_price = "RMB " + data.slice(_start, _end);
+		_start = data.indexOf("￥") + 1;
+		_end = data.indexOf("<", _start);
+		_price = "RMB " + data.slice(_start, _end);
 
-			appendItemNode("buyinfo-amazon", "亚马逊", _link, _price);
-		}
-		else{
-			console.log("No found on Amazon");
-		}
+		return (new bookInfo(_link, _price));
 	}
-	else {
-		console.log("Get Amazon failed, status = " + status);
+	else{
+		return null;
 	}
 }
 
-function processTangcha (data, status) {
-	var _start, _end;
-	var _link, _price;
+function processTangcha (data) {
+	var _start, _end, _link;
 
-	if (status === "success") {
-		if (data.indexOf("无法找到相关的书籍") == -1) {
-			_start = data.indexOf("book-cell");
-			_start = data.indexOf("href", _start) + 7;
-			_end = data.indexOf("class", _start) - 2;
-			_link = data.slice(_start, _end);
-			_link = "http://tangcha.tc/" + _link;
+	if (data.indexOf("无法找到相关的书籍") == -1) {
+		_start = data.indexOf("book-cell");
+		_start = data.indexOf("href", _start) + 7;
+		_end = data.indexOf("class", _start) - 2;
+		_link = data.slice(_start, _end);
+		_link = "http://tangcha.tc/" + _link;
 
-			appendItemNode("buyinfo-tangcha", "唐茶字节社", _link, "fetching");
+		$.get(
+			_link + "/partial.html",
+			function(data, status) {
+				console.log("url = " + this.url);
+				var _start, _end, _price;
 
-			$.get(
-				_link + "/partial.html",
-				function(data, status) {
-					var _start, _end, _price;
-
-					if (status === "success") {
-						_start = data.indexOf("book-purchase");
-						_start = data.indexOf(">", _start) + 3;
-						_end = data.indexOf("<", _start);
-						_price = "RMB " + data.slice(_start, _end);
-
-						document.getElementById("buyinfo-tangcha")
-							.getElementsByTagName("span")[1]
-							.getElementsByTagName("span")[0]
-							.firstChild.nodeValue = _price;
-					}
-					else {
-						console.log("Get Tangcha failed, status = " + status);
-						var _buyinfoTangcha = document.getElementById("buyinfo-tangcha");
-						_buyinfoTangcha.parentNode.removeChild(_buyinfoTangcha);
-					}
+				if (status === "success") {
+					_start = data.indexOf("book-purchase");
+					_start = data.indexOf(">", _start) + 3;
+					_end = data.indexOf("<", _start);
+					_price = "RMB " + data.slice(_start, _end);
+					console.log(_price);
+					document.getElementById("buyinfo-Tangcha")
+						.getElementsByTagName("span")[1]
+						.getElementsByTagName("span")[0]
+						.firstChild.nodeValue = _price;
+					console.log(document.getElementById("buyinfo-Tangcha")
+						.getElementsByTagName("span")[1]
+						.getElementsByTagName("span")[0]);
 				}
-			);
-		}
-		else{
-			console.log("No found on Tangcha");
-		}
+				else {
+					console.log("Get Tangcha failed, status = " + status);
+					var _buyinfoTangcha = document.getElementById("buyinfo-Tangcha");
+					_buyinfoTangcha.parentNode.removeChild(_buyinfoTangcha);
+				}
+			}
+		);
+		return (new bookInfo(_link, "fetching"));
 	}
-	else {
-		console.log("Get Tangcha failed, status = " + status);
+	else{
+		return null;
 	}
 }
 
-function processYuncheng (data, status) {
+function processYuncheng (data) {
 	var _start, _end;
 	var _link, _price;
 
-	if (status === "success") {
-		if (data.indexOf("很抱歉，没有找到") == -1) {
-			_start = data.indexOf("booklist");
-			_start = data.indexOf("href", _start) + 7;
-			_end = data.indexOf("rank", _start) - 2;
-			_link = data.slice(_start, _end);
-			_link = "http://www.yuncheng.com/" + _link;
+	if (data.indexOf("很抱歉，没有找到") == -1) {
+		_start = data.indexOf("booklist");
+		_start = data.indexOf("href", _start) + 7;
+		_end = data.indexOf("rank", _start) - 2;
+		_link = data.slice(_start, _end);
+		_link = "http://www.yuncheng.com/" + _link;
 
-			_start = data.indexOf("云 城 价") + 6;
-			_end = _start + 2;
-			_price = data.slice(_start, _end);
+		_start = data.indexOf("云 城 价") + 6;
+		_end = _start + 2;
+		_price = data.slice(_start, _end);
 
-			if (_price !== "免费") {
-				_start = data.indexOf(">", _start) + 6;
-				_end = data.indexOf("<", _start) - 1;
-				_price = "RMB " + data.slice(_start, _end);
-			}
-
-			appendItemNode("buyinfo-yuncheng", "云中书城", _link, _price);
+		if (_price !== "免费") {
+			_start = data.indexOf(">", _start) + 6;
+			_end = data.indexOf("<", _start) - 1;
+			_price = "RMB " + data.slice(_start, _end);
 		}
-		else{
-			console.log("No found on Yuncheng");
-		}
+
+		return (new bookInfo(_link, _price));
 	}
-	else {
-		console.log("Get Yuncheng failed, status = " + status);
+	else{
+		return null;
 	}
 }
 
-function processDuokan (data, status) {
-	if (status === "success") {
-		if (data.count > 0) {
-			appendItemNode("buyinfo-duokan", this.chnName,
-				"http://book.duokan.com/" + data.items[0].afs + "/b/" + data.items[0].sid,
-				getPriceString(data.items[0].price));
-		}
-		else {
-			console.log("No found on Duokan");
-		}
+function processDuokan (data) {
+	if (data.count > 0) {
+		return (new bookInfo("http://book.duokan.com/" + data.items[0].afs + "/b/" + data.items[0].sid,
+			getPriceString(data.items[0].price)));
 	}
 	else {
-		console.log("Get Duokan failed, status = " + status);
+		return null;
 	}
+}
+
+function bookInfo (link, price) {
+	this.link = link;
+	this.price = price;
 }
 
 function OnlineBookStore(name, chnName, searchUrlTmpl, functionOfDataProcess) {
 	this.name = name;
 	this.chnName = chnName;
 	this.searchUrlTmpl = searchUrlTmpl;
-	this.functionForGet = functionOfDataProcess;
+	this.functionOfDataProcess = functionOfDataProcess;
+	this.functionForGet = function (data, status) {
+		var _bookInfoReturned;
+		if (status === "success") {
+			_bookInfoReturned = this.functionOfDataProcess(data);
+
+			if (_bookInfoReturned !== null) {
+				appendItemNode("buyinfo-" + this.name, this.chnName,
+					_bookInfoReturned.link, _bookInfoReturned.price);
+			}
+			else {
+				console.log("No found on " + this.name);
+			}
+		}
+		else {
+			console.log("Get " + this.name + " failed, status = " + status);
+		}
+	};
 }
 
 (function () {
