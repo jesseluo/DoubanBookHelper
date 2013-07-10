@@ -107,11 +107,17 @@ function processTangcha (data) {
 				var _start, _end, _price;
 
 				if (status === "success") {
-					_start = data.indexOf("book-purchase");
-					_start = data.indexOf(">", _start) + 3;
-					_end = data.indexOf("<", _start);
-					_price = "RMB " + data.slice(_start, _end);
+					if (data.indexOf("已购买") !== -1) {
+						_price = "已购买";
+					}
+					else {
+						_start = data.indexOf("book-purchase");
+						_start = data.indexOf(">", _start) + 3;
+						_end = data.indexOf("<", _start);
+						_price = "RMB " + data.slice(_start, _end);
+					}
 					console.log(_price);
+
 					document.getElementById("buyinfo-Tangcha")
 						.getElementsByTagName("span")[1]
 						.getElementsByTagName("span")[0]
