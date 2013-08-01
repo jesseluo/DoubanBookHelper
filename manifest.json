@@ -1,23 +1,25 @@
 {
   "name": "Douban Book Helper",
-  "version": "0.4.711",
+  "version": "0.4.802",
   "manifest_version": 2,
   "description": "增强豆瓣读书对电子书的支持",
 
-  "browser_action": {
+  "page_action": {
     "default_icon": "icon.png",
     "default_title": "Douban Book Helper"
   },
-
+  "background": { 
+    "scripts": ["background.js"] 
+  },
   "content_scripts": [
     {
       "matches": ["http://book.douban.com/subject/*/"],
-      "js": ["jquery-1.9.1.min.js", "modifier.js"],
+      "js": ["jquery-1.9.1.min.js", "contentscript.js"],
       "run_at": "document_end"
     }
   ],
-
   "permissions": [
+    "tabs",
     "http://*.duokan.com/",
     "http://tangcha.tc/",
     "http://www.yuncheng.com/",

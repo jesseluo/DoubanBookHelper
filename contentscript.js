@@ -208,6 +208,8 @@ function OnlineBookStore(name, chnName, searchUrlTmpl, functionOfDataProcess) {
 }
 
 (function () {
+	// call background.js to show page action
+	chrome.extension.sendRequest({}, function(response) {});
 	makeItemNodeTemplate();
 	makeBuyinfoNode();
 
